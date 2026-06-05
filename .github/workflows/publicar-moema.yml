@@ -1,7 +1,10 @@
-name: Publicar Vila Mariana
+name: Publicar Moema
 
 on:
-  workflow_dispatch:  # já publicado em 05/06 como teste — cron removido pra não duplicar
+  schedule:
+    # Terça 09/06/2026 às 11:00 BR (= 14:00 UTC)
+    - cron: '0 14 9 6 *'
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -25,4 +28,4 @@ jobs:
           META_API_VERSION:        v19.0
           GITHUB_REPOSITORY:       ${{ github.repository }}
           GITHUB_REF_NAME:         ${{ github.ref_name }}
-        run: python lib/publish_carousel.py --folder posts/vila_mariana --caption-file posts/vila_mariana/caption.txt
+        run: python lib/publish_carousel.py --folder posts/moema --caption-file posts/moema/caption.txt
