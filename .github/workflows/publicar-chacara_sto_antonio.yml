@@ -1,0 +1,28 @@
+name: Publicar Chacara Santo Antonio
+
+on:
+  schedule:
+    # Terca 28/07/2026 as 11:00 BR (= 14:00 UTC)
+    - cron: '0 14 28 7 *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install requests
+      - name: Publicar carrossel
+        env:
+          INSTAGRAM_BUSINESS_ID:   ${{ secrets.INSTAGRAM_BUSINESS_ID }}
+          INSTAGRAM_ACCESS_TOKEN:  ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          META_API_VERSION:        v19.0
+          GITHUB_REPOSITORY:       ${{ github.repository }}
+          GITHUB_REF_NAME:         ${{ github.ref_name }}
+        run: python lib/publish_carousel.py --folder posts/chacara_sto_antonio --caption-file posts/chacara_sto_antonio/caption.txt
