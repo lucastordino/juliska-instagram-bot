@@ -1,9 +1,6 @@
 name: Publicar Vila Nova Conceicao
 
 on:
-  schedule:
-    # Terca 21/07/2026 as 11:00 BR (= 14:00 UTC)
-    - cron: '0 14 21 7 *'
   workflow_dispatch:
 
 jobs:

@@ -1,9 +1,6 @@
 name: Publicar Campo Belo
 
 on:
-  schedule:
-    # Terca 23/06/2026 as 11:00 BR (= 14:00 UTC)
-    - cron: '0 14 23 6 *'
   workflow_dispatch:
 
 jobs:

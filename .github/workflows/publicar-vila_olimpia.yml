@@ -1,9 +1,6 @@
 name: Publicar Vila Olimpia
 
 on:
-  schedule:
-    # Terca 30/06/2026 as 11:00 BR (= 14:00 UTC)
-    - cron: '0 14 30 6 *'
   workflow_dispatch:
 
 jobs:

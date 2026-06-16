@@ -1,9 +1,6 @@
 name: Publicar Dica · Planta x Pronto
 
 on:
-  schedule:
-    # Quinta 09/07/2026 as 11:00 BR (= 14:00 UTC)
-    - cron: '0 14 9 7 *'
   workflow_dispatch:
 
 jobs:

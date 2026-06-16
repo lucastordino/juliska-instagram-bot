@@ -1,9 +1,6 @@
 name: Publicar Pinheiros
 
 on:
-  schedule:
-    # Terca 14/07/2026 as 11:00 BR (= 14:00 UTC)
-    - cron: '0 14 14 7 *'
   workflow_dispatch:
 
 jobs:

@@ -1,9 +1,6 @@
 name: Publicar Chacara Santo Antonio
 
 on:
-  schedule:
-    # Terca 28/07/2026 as 11:00 BR (= 14:00 UTC)
-    - cron: '0 14 28 7 *'
   workflow_dispatch:
 
 jobs:
