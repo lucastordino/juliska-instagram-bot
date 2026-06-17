@@ -1,7 +1,7 @@
 name: Publicar Campo Belo
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # disparo pelo agendador Apps Script (cron do GitHub é nao-confiavel)
 
 jobs:
   publish:

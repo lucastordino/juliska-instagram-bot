@@ -4,13 +4,25 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1080, 1350
-BG=(243,236,222); TEXTO=(60,52,39); OURO=(173,138,74); OURO_CL=(191,157,93)
-LABEL=(140,126,99); SUB=(78,68,52)
+# ── Paleta "Geração A" — harmoniza com o feed (Moema/Brooklin/V.Mariana/Linha17) ──
+CREME_TOP=(242,233,216); CREME_BOTTOM=(231,218,193)   # gradiente vertical do fundo
+DOURADO=(139,111,46)        # filete, eyebrow gold, "CONTINUE"
+DOURADO_FORT=(184,137,61)   # título do bairro, número, citações
+ESCURO=(26,20,9)            # eyebrow ALL-CAPS
+CINZA=(45,45,45)           # corpo (Georgia, legível)
+CINZA_MUTED=(107,107,107)   # rodapé/créditos
 F="/System/Library/Fonts/Supplemental/"
 def didot(s,i=0): return ImageFont.truetype(F+"Didot.ttc",s,index=i)
-def did_it(s): return didot(s,1)
 def did_bd(s): return didot(s,2)
+def georgia(s): return ImageFont.truetype(F+"Georgia.ttf",s)
+def bask_it(s): return ImageFont.truetype(F+"Baskerville.ttc",s,index=2)
 def sans(s): return ImageFont.truetype(F+"Futura.ttc",s,index=0)
+def bg():
+    g=Image.new("RGB",(1,H))
+    for y in range(H):
+        t=y/(H-1)
+        g.putpixel((0,y),tuple(int(CREME_TOP[i]+(CREME_BOTTOM[i]-CREME_TOP[i])*t) for i in range(3)))
+    return g.resize((W,H))
 def wrap(d,t,f,mw):
     o,l=[],""
     for w in t.split():
@@ -26,58 +38,58 @@ def ctr(d,y,t,f,fill): d.text(((W-d.textlength(t,font=f))/2,y),t,font=f,fill=fil
 def seta(d,x,y,fill,w=26):
     d.line([(x,y),(x+w,y)],fill=fill,width=2)
     d.line([(x+w-8,y-6),(x+w,y),(x+w-8,y+6)],fill=fill,width=2,joint="curve")
+def divisor(d,y,w=70): d.line([(W//2-w,y),(W//2+w,y)],fill=DOURADO,width=2)
 def rodape(d,cont=True):
+    # rodapé centralizado, igual ao feed antigo
     if cont:
-        f=sans(20); trk(d,H-92,"CONTINUE",f,LABEL,3,cx=200)
-        wt=sum(d.textlength(c,font=f) for c in "CONTINUE")+3*7
-        seta(d,200+wt/2+22,H-80,LABEL)
-    trk(d,H-92,"POR JULISKA TORDINO · CYRELA",sans(19),LABEL,3,cx=W-330 if cont else W//2)
-def divisor(d,y,w=70): d.line([(W//2-w,y),(W//2+w,y)],fill=OURO,width=2)
+        f=sans(21); txt="CONTINUE"
+        wt=sum(d.textlength(c,font=f) for c in txt)+3*(len(txt)-1); total=wt+46
+        x0=(W-total)/2; trk(d,H-158,txt,f,DOURADO,3,cx=x0+wt/2)
+        seta(d,x0+wt+20,H-146,DOURADO)
+    trk(d,H-92,"CYRELA · POR JULISKA TORDINO",sans(19),CINZA_MUTED,3)
 
 def capa_bairro(label,nome,sub,out):
-    img=Image.new("RGB",(W,H),BG);d=ImageDraw.Draw(img)
-    trk(d,150,label.upper(),sans(24),LABEL,6)
-    fn=did_bd(112 if len(nome)<=12 else 78); ctr(d,470 if len(nome)<=12 else 500,nome.upper(),fn,TEXTO)
-    yb=470+150 if len(nome)<=12 else 500+110; divisor(d,yb)
-    fs=did_it(46); y=yb+50
-    for ln in wrap(d,sub,fs,W-260): ctr(d,y,ln,fs,SUB); y+=60
+    img=bg();d=ImageDraw.Draw(img)
+    trk(d,170,label.upper(),sans(25),ESCURO,8)
+    n=nome.upper(); fs=118 if len(n)<=7 else (94 if len(n)<=11 else 68)
+    yt=445; trk(d,yt,n,did_bd(fs),DOURADO_FORT,max(4,int(fs*0.11)))
+    divisor(d,yt+fs+58); fsub=bask_it(48); y=yt+fs+118
+    for ln in wrap(d,sub,fsub,W-280): ctr(d,y,ln,fsub,CINZA); y+=64
     rodape(d,True); img.save(out,quality=95)
 
 def capa_dica(label,perg,sub,out):
-    img=Image.new("RGB",(W,H),BG);d=ImageDraw.Draw(img)
-    trk(d,150,label.upper(),sans(24),LABEL,6)
-    fp=did_it(70); lines=wrap(d,perg,fp,W-220); y=520-len(lines)*44
-    for ln in lines: ctr(d,y,ln,fp,TEXTO); y+=84
-    divisor(d,y+30); y+=70; fs=did_it(40)
-    for ln in wrap(d,sub,fs,W-300): ctr(d,y,ln,fs,SUB); y+=54
+    img=bg();d=ImageDraw.Draw(img)
+    trk(d,170,label.upper(),sans(25),ESCURO,8)
+    fp=bask_it(66); lines=wrap(d,perg,fp,W-230); y=460-len(lines)*46
+    for ln in lines: ctr(d,y,ln,fp,DOURADO_FORT); y+=88
+    divisor(d,y+24); y+=74; fs=bask_it(42)
+    for ln in wrap(d,sub,fs,W-320): ctr(d,y,ln,fs,CINZA); y+=58
     rodape(d,True); img.save(out,quality=95)
 
-def conteudo(titulo,corpo,out):
-    img=Image.new("RGB",(W,H),BG);d=ImageDraw.Draw(img)
-    d.line([(110,170),(240,170)],fill=OURO,width=3)
-    ft=did_bd(62); y=240
-    for ln in wrap(d,titulo,ft,W-220): d.text((110,y),ln,font=ft,fill=TEXTO); y+=76
-    y+=30; fb=didot(38)
-    for ln in wrap(d,corpo,fb,W-220): d.text((110,y),ln,font=fb,fill=SUB); y+=56
-    rodape(d,False); img.save(out,quality=95)
+def conteudo(header,titulo,corpo,out):
+    img=bg();d=ImageDraw.Draw(img)
+    trk(d,180,header.upper(),sans(24),ESCURO,7); divisor(d,242,58)
+    ft=did_bd(72); y=370
+    for ln in wrap(d,titulo,ft,W-220): ctr(d,y,ln,ft,DOURADO_FORT); y+=86
+    divisor(d,y+24,55); y+=78; fb=georgia(37)
+    for ln in wrap(d,corpo,fb,W-300): ctr(d,y,ln,fb,CINZA); y+=56
+    rodape(d,True); img.save(out,quality=95)
 
-def fecho(frase,out):
-    img=Image.new("RGB",(W,H),BG);d=ImageDraw.Draw(img)
-    fr=did_it(48); y=400
-    for ln in wrap(d,frase,fr,W-220): ctr(d,y,ln,fr,TEXTO); y+=64
-    divisor(d,y+40); y+=80
-    ctr(d,y,"Juliska Tordino",did_bd(56),OURO); y+=92
-    trk(d,y,"CORRETORA · CYRELA · CRECI 133.239-F",sans(20),LABEL,4); y+=44
-    trk(d,y,"(11) 9.8127.6060 · @JULISKA.IMOVEIS",sans(18),LABEL,3)
+def fecho(header,frase,out):
+    img=bg();d=ImageDraw.Draw(img)
+    trk(d,180,header.upper(),sans(24),ESCURO,7); divisor(d,242,58)
+    fr=bask_it(50); y=415
+    for ln in wrap(d,frase,fr,W-250): ctr(d,y,ln,fr,DOURADO_FORT); y+=66
+    divisor(d,y+34,55); y+=92
+    ctr(d,y,"Juliska Tordino",bask_it(64),DOURADO_FORT); y+=104
+    trk(d,y,"CORRETORA · CYRELA · CRECI 133.239-F",sans(20),CINZA_MUTED,4); y+=46
+    trk(d,y,"(11) 9.8127.6060 · @JULISKA.IMOVEIS",sans(18),CINZA_MUTED,3)
     img.save(out,quality=95)
 
 WF='''name: Publicar {nome}
 
 on:
-  schedule:
-    # {databr} as 11:00 BR (= 14:00 UTC)
-    - cron: '{cron}'
-  workflow_dispatch:
+  workflow_dispatch:   # disparo pelo agendador Apps Script (cron do GitHub é nao-confiavel)
 
 jobs:
   publish:
@@ -105,14 +117,16 @@ def build(p):
     slug=p["slug"]; os.makedirs(f"posts/{slug}",exist_ok=True)
     if p["tipo"]=="bairro":
         capa_bairro(p["label"],p["nome"],p["sub"],f"posts/{slug}/slide_1.png")
+        hdr=f"{p['nome']} · 2026"; fhdr=f"Em atendimento · {p['nome']}"
     else:
         capa_dica(p["label"],p["perg"],p["sub"],f"posts/{slug}/slide_1.png")
-    conteudo(p["p1"][0],p["p1"][1],f"posts/{slug}/slide_2.png")
-    conteudo(p["p2"][0],p["p2"][1],f"posts/{slug}/slide_3.png")
-    fecho(p["fecho"],f"posts/{slug}/slide_4.png")
+        hdr=p["label"]; fhdr=p["label"]
+    conteudo(hdr,p["p1"][0],p["p1"][1],f"posts/{slug}/slide_2.png")
+    conteudo(hdr,p["p2"][0],p["p2"][1],f"posts/{slug}/slide_3.png")
+    fecho(fhdr,p["fecho"],f"posts/{slug}/slide_4.png")
     open(f"posts/{slug}/caption.txt","w").write(p["caption"].strip()+"\n")
     open(f".github/workflows/publicar-{slug}.yml","w").write(
-        WF.format(nome=p["nome_wf"],databr=p["databr"],cron=p["cron"],slug=slug))
+        WF.format(nome=p["nome_wf"],slug=slug))
     print("  ✓",slug,"·",p["databr"])
 
 # ════ CONTEÚDO DOS 14 POSTS ════
